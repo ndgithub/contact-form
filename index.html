@@ -7,12 +7,11 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
+      margin: 0;
       background-color: #f9f9f9;
     }
     .container {
@@ -84,7 +83,7 @@
 
       try {
         const response = await fetch(
-          'https://script.google.com/macros/s/AKfycbzIjObphjtoA5xYlf-wTMio-mQxpZrfgRXGLabAVIbjOcpSdAJ0qX2w2pvDlBvm75dv/exec',
+          'https://script.google.com/macros/s/AKfycbzIjObphjtoA5xYlf-wTMio-mQxpZrfgRXGLabAVIbjOcpSdAJ0qX2w2pvDlBvm75dv/exec', // Replace with updated deploy URL
           {
             method: 'POST',
             headers: {
@@ -95,7 +94,8 @@
         );
 
         if (response.ok) {
-          document.getElementById('contact-form').style.display = 'none';
+          form.reset();
+          form.style.display = 'none';
           document.getElementById('thank-you').style.display = 'block';
         } else {
           console.error('Submission failed with status:', response.status);
