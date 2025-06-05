@@ -1,28 +1,90 @@
-<script>
-  const form = document.getElementById('contact-form');
-  const thankYouMessage = document.getElementById('thank-you');
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxwnktWIOJt23xggmrcSHBZ4vcXdRC9gyON173bALno0huTx22mUdW4BPX6C64xDIAC/exec';
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const formData = new FormData(form);
-
-    try {
-      const response = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors', // <--- KEY POINT
-        body: formData
-      });
-
-      // Even if it's opaque (no headers readable), it succeeded.
-      // So we just assume success if no fetch() error was thrown.
-      form.reset();
-      thankYouMessage.style.display = 'block';
-
-    } catch (err) {
-      console.error('Submission error:', err);
-      alert('Something went wrong. Please try again later.');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Simple Contact Form</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background-color: #f8fafc;
+      padding: 20px;
     }
-  });
-</script>
+    form {
+      background: white;
+      padding: 2rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+    input, button {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border-radius: 0.375rem;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    button {
+      background-color: #3b82f6;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #2563eb;
+    }
+    #thank-you {
+      display: none;
+      margin-top: 1rem;
+      color: green;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <form id="contact-form">
+    <h2 style="text-align:center; margin-bottom: 1rem;">Contact Us</h2>
+    <input type="text" name="name" placeholder="Your Name" required />
+    <input type="tel" name="phone" placeholder="Your Phone Number" required />
+    <input type="email" name="email" placeholder="Your Email" required />
+    <button type="submit">Submit</button>
+    <div id="thank-you">Thank you for your submission!</div>
+  </form>
+
+  <script>
+    const form = document.getElementById('contact-form');
+    const thankYouMessage = document.getElementById('thank-you');
+
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxwnktWIOJt23xggmrcSHBZ4vcXdRC9gyON173bALno0huTx22mUdW4BPX6C64xDIAC/exec'; // Replace this with your actual URL
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors', // Important to avoid CORS errors
+          body: formData
+        });
+
+        form.reset();
+        thankYouMessage.style.display = 'block';
+      } catch (err) {
+        console.error('Submission failed:', err);
+        alert('Something went wrong. Please try again later.');
+      }
+    });
+  </script>
+
+</body>
+</html>
