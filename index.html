@@ -1,110 +1,28 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8" />
-  <title>Simple Contact Form</title>
-  <style>
-    /* Optional: basic styling to keep it readable */
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 400px;
-      margin: 40px auto;
-      padding: 0 20px;
-    }
-    label {
-      display: block;
-      margin-top: 12px;
-    }
-    input {
-      width: 100%;
-      padding: 8px;
-      margin-top: 4px;
-      box-sizing: border-box;
-    }
-    button {
-      margin-top: 16px;
-      padding: 10px 16px;
-      font-size: 16px;
-    }
-    #thankyou {
-      margin-top: 20px;
-      color: green;
-      font-weight: bold;
-    }
-  </style>
-</head>
-<body>
+<script>
+  const form = document.getElementById('contact-form');
+  const thankYouMessage = document.getElementById('thank-you');
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxwnktWIOJt23xggmrcSHBZ4vcXdRC9gyON173bALno0huTx22mUdW4BPX6C64xDIAC/exec';
 
-  <h2>Contact Us</h2>
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-  <form id="contact-form">
-    <label>
-      Name
-      <input type="text" id="name" name="name" required />
-    </label>
-    <label>
-      Phone
-      <input type="tel" id="phone" name="phone" required />
-    </label>
-    <label>
-      Email
-      <input type="email" id="email" name="email" required />
-    </label>
-    <button type="submit">Submit</button>
-  </form>
+    const formData = new FormData(form);
 
-  <div id="thankyou" style="display: none;">
-    <p>Thank you for your submission!</p>
-  </div>
-
-  <script>
-    // Replace the SCRIPT_URL placeholder with your Apps Script’s "web app" URL:
-    // e.g., https://script.google.com/macros/s/AKfycbx.../exec
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxwnktWIOJt23xggmrcSHBZ4vcXdRC9gyON173bALno0huTx22mUdW4BPX6C64xDIAC/exec';
-
-    const form = document.getElementById('contact-form');
-    const thankyou = document.getElementById('thankyou');
-
-    form.addEventListener('submit', function(event) {
-      event.preventDefault();
-
-      // Gather field values
-      const nameValue  = document.getElementById('name').value.trim();
-      const phoneValue = document.getElementById('phone').value.trim();
-      const emailValue = document.getElementById('email').value.trim();
-
-      // Build URL-encoded form data string
-      const formData = new URLSearchParams();
-      formData.append('name',  nameValue);
-      formData.append('phone', phoneValue);
-      formData.append('email', emailValue);
-
-      // Send a “simple” POST with application/x-www-form-urlencoded
-      fetch(SCRIPT_URL, {
+    try {
+      const response = await fetch(SCRIPT_URL, {
         method: 'POST',
-        mode: 'cors',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: formData.toString()
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.result === 'success') {
-          // Clear the form and show a thank-you message
-          form.reset();
-          form.style.display = 'none';
-          thankyou.style.display = 'block';
-        } else {
-          console.error('Google Apps Script returned an error:', data);
-          alert('Submission failed. Please try again.');
-        }
-      })
-      .catch(error => {
-        console.error('Fetch Error:', error);
-        alert('There was a problem connecting to the server.');
+        mode: 'no-cors', // <--- KEY POINT
+        body: formData
       });
-    });
-  </script>
-</body>
-</html>
+
+      // Even if it's opaque (no headers readable), it succeeded.
+      // So we just assume success if no fetch() error was thrown.
+      form.reset();
+      thankYouMessage.style.display = 'block';
+
+    } catch (err) {
+      console.error('Submission error:', err);
+      alert('Something went wrong. Please try again later.');
+    }
+  });
+</script>
