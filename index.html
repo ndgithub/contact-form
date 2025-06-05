@@ -1,113 +1,109 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Contact Form</title>
+  <title>Simple Contact Form</title>
   <style>
+    /* Optional: basic styling to keep it readable */
     body {
       font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      background-color: #f9f9f9;
-    }
-    .container {
       max-width: 400px;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      padding: 20px;
-    }
-    form {
-      display: flex;
-      flex-direction: column;
+      margin: 40px auto;
+      padding: 0 20px;
     }
     label {
-      margin-bottom: 5px;
-      font-weight: bold;
+      display: block;
+      margin-top: 12px;
     }
     input {
-      margin-bottom: 15px;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      box-sizing: border-box;
     }
     button {
-      padding: 10px;
-      background-color: #007BFF;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
+      margin-top: 16px;
+      padding: 10px 16px;
+      font-size: 16px;
     }
-    button:hover {
-      background-color: #0056b3;
-    }
-    #thank-you {
-      display: none;
-      text-align: center;
+    #thankyou {
+      margin-top: 20px;
+      color: green;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <form id="contact-form">
-      <label for="name">Name</label>
-      <input type="text" id="name" name="name" required>
 
-      <label for="email">Email</label>
-      <input type="email" id="email" name="email" required>
+  <h2>Contact Us</h2>
 
-      <label for="phone">Phone</label>
-      <input type="tel" id="phone" name="phone" required>
+  <form id="contact-form">
+    <label>
+      Name
+      <input type="text" id="name" name="name" required />
+    </label>
+    <label>
+      Phone
+      <input type="tel" id="phone" name="phone" required />
+    </label>
+    <label>
+      Email
+      <input type="email" id="email" name="email" required />
+    </label>
+    <button type="submit">Submit</button>
+  </form>
 
-      <button type="submit">Submit</button>
-    </form>
-    <div id="thank-you">
-      <h2>Thank you for your submission!</h2>
-    </div>
+  <div id="thankyou" style="display: none;">
+    <p>Thank you for your submission!</p>
   </div>
 
   <script>
-    document.getElementById('contact-form').addEventListener('submit', async function (event) {
+    // Replace the SCRIPT_URL placeholder with your Apps Script’s "web app" URL:
+    // e.g., https://script.google.com/macros/s/AKfycbx.../exec
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx7obMtIt3OiBunyODtR2OHclknQ2LpWNuDK_fkxz-KIgKMrWCmqWbPeJL7LjcZTi_O/exec';
+
+    const form = document.getElementById('contact-form');
+    const thankyou = document.getElementById('thankyou');
+
+    form.addEventListener('submit', function(event) {
       event.preventDefault();
 
-      const form = event.target;
+      // Gather field values
+      const nameValue  = document.getElementById('name').value.trim();
+      const phoneValue = document.getElementById('phone').value.trim();
+      const emailValue = document.getElementById('email').value.trim();
+
+      // Build URL-encoded form data string
       const formData = new URLSearchParams();
-      formData.append("name", form.name.value);
-      formData.append("email", form.email.value);
-      formData.append("phone", form.phone.value);
+      formData.append('name',  nameValue);
+      formData.append('phone', phoneValue);
+      formData.append('email', emailValue);
 
-      try {
-        const response = await fetch(
-          'https://script.google.com/macros/s/AKfycbyYPSQw6DD5TbjYDuRFeOuI5b8Y3Ktl5G4hG7wsNPCP1E9pq70-h9lIZMBg5XpEukQc/exec', // Replace this line with your Apps Script Web App URL
-          {
-            method: 'POST',
-            mode: 'cors',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: formData.toString()
-          }
-        );
-
-        const result = await response.json();
-
-        if (result.status === "success") {
+      // Send a “simple” POST with application/x-www-form-urlencoded
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: formData.toString()
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.result === 'success') {
+          // Clear the form and show a thank-you message
           form.reset();
           form.style.display = 'none';
-          document.getElementById('thank-you').style.display = 'block';
+          thankyou.style.display = 'block';
         } else {
-          console.error("Error from server:", result.message);
-          alert("There was a problem submitting the form.");
+          console.error('Google Apps Script returned an error:', data);
+          alert('Submission failed. Please try again.');
         }
-      } catch (error) {
-        console.error('Fetch error:', error);
-        alert("An error occurred. Please try again.");
-      }
+      })
+      .catch(error => {
+        console.error('Fetch Error:', error);
+        alert('There was a problem connecting to the server.');
+      });
     });
   </script>
 </body>
